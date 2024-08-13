@@ -1,6 +1,9 @@
 name: Build binary release
 
-on: [push]
+on: 
+  push:
+    branches:
+      - main
 
 jobs:
   build:
