@@ -1,3 +1,40 @@
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum LoginRole {
+    Admin,
+    User,
+}
+
+pub enum LoginAction {
+    Role(LoginRole),
+    Denied,
+}
+
+
+pub struct User {
+    pub username: String,
+    pub password: String,
+    pub role: LoginRole,
+}
+
+impl User {
+    pub fn new(username: &str, passsword: &str, user_role: LoginRole) -> User {
+        User {
+            username: username.to_string(),
+            password: passsword.to_string(),
+            role: user_role,
+        }
+    }
+}
+
+
+fn get_users() -> Vec<User> {
+    vec![
+        User::new("admin", "1234", LoginRole::Admin),
+        User::new("alice", "1234", LoginRole::User),
+    ]
+}
+
+
 
 pub fn greet_user(name: &str) -> String {
     format!("Hello, {name}!")
@@ -15,6 +52,22 @@ pub fn login_users(user : &str, password : &str) -> Option<LoginAction> {
     let user: String = user.to_lowercase();
     let mut result: Option<LoginAction> = Some(LoginAction::Denied);
     
+    let users: Vec<User> = get_users();
+
+    if let Some(userdb) = users.iter().find(|iuser: &&User| iuser.username == user) {
+        if userdb.password == password {
+            result = Some(LoginAction::Role(userdb.role.clone()));
+        } else {
+            result = Some(LoginAction::Denied);
+        }
+    }
+    result
+}
+
+pub fn login_users_fixed(user : &str, password : &str) -> Option<LoginAction> {
+    let user: String = user.to_lowercase();
+    let mut result: Option<LoginAction> = Some(LoginAction::Denied);
+    
     if user != "admin" && user != "alice" {
         return None;
     } 
@@ -26,17 +79,6 @@ pub fn login_users(user : &str, password : &str) -> Option<LoginAction> {
     }
 
     result
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum LoginRole {
-    Admin,
-    User,
-}
-
-pub enum LoginAction {
-    Role(LoginRole),
-    Denied,
 }
 
 pub fn read_line() -> String {
