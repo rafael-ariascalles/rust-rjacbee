@@ -1,5 +1,5 @@
 [package]
-name = "live"
+name = "login"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,4 @@ edition = "2021"
 
 [dependencies]
 
-[workspace]
-members = [ "authentication", "command", "login","variable"]
+authentication = { path = "../authentication" }
