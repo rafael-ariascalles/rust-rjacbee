@@ -15,8 +15,6 @@ struct Args {
 enum Command {
     /// List the information of the users
     List,
-    /// list of all users
-    ListAll,
     /// Add users to the system
     Add {
         /// The username of the user to add
@@ -27,6 +25,11 @@ enum Command {
         #[arg(long)]
         admin: bool,
     },
+    /// Remove users from the system
+    Delete {
+        /// The username of the user to remove
+        username: String,
+    }
 }
 
 fn add_user(username: String, password: String, admin: bool) {
@@ -41,6 +44,17 @@ fn add_user(username: String, password: String, admin: bool) {
     let new_user = User::new(&username, &password, role);
     users.insert(username, new_user);
     save_users(users);
+}
+
+fn delete_user(username: String) {
+    let mut users: std::collections::HashMap<String, User> = get_users();
+    if users.contains_key(&username) {
+        users.remove(&username);
+        save_users(users);
+    } else {
+        println!("User {} not found", username);
+    }
+    
 }
 
 fn list_users() {
@@ -63,14 +77,11 @@ fn main() {
         Some(Command::List) => {
             list_users();
         },
-        Some(Command::ListAll) => {
-            let lines: String = "-".repeat(100).to_string();
-            println!("{}",lines);
-            println!("the list of all users is 1");
-            println!("{}",lines);
-        },
         Some(Command::Add {username, password, admin}) => {
             add_user(username, password, admin);
+        },
+        Some(Command::Delete {username}) => {
+            delete_user(username);
         },
         None => {
             print!("run --help for more information");
