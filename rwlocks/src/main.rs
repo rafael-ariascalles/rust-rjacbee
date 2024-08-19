@@ -2,12 +2,12 @@ use std::sync::RwLock;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
-static USERS: Lazy<RwLock<HashMap<String,String>>> = Lazy::new(|| RwLock::new(create_users()));
+static USERS: Lazy<RwLock<HashMap<String,i8>>> = Lazy::new(|| RwLock::new(create_users()));
 
-fn create_users() ->HashMap<String,String> {
-    let mut users = HashMap::new();
-    users.insert("Alice".to_string(), "Active".to_string());
-    users.insert("Bob".to_string(), "Inactive".to_string());
+fn create_users() ->HashMap<String,i8> {
+    let mut users: HashMap<String, i8> = HashMap::new();
+    users.insert("Alice".to_string(), 0);
+    users.insert("Bob".to_string(), 0);
     users
 }
 
@@ -20,8 +20,9 @@ fn read_line() -> String {
 fn main() {
     std::thread::spawn(|| {
         loop {
-            println!("Current users: {:?}", USERS.read().unwrap());
             std::thread::sleep(std::time::Duration::from_secs(5));
+            println!("Current users: {:?}", USERS.read().unwrap());
+            
         }
     });
 
@@ -33,7 +34,15 @@ fn main() {
             break;
         }else {
             let mut lock = USERS.write().unwrap();
-            lock.insert(input, "Active".to_string());
+            
+            if lock.contains_key(&input) {
+                let count: &mut i8 = lock.get_mut(&input).unwrap();
+                *count += 1;
+                println!("User count updated!");
+                continue;
+            }
+
+            lock.insert(input, 1);
             println!("User added!");
         }
     }
